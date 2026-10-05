@@ -15,5 +15,7 @@ export default defineConfig({
     setupFiles: ["./vitest.setup.ts"],
     clearMocks: true,
     restoreMocks: true,
+    pool: "threads",
+    maxWorkers: 1,
   },
 });
