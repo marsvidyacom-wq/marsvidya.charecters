@@ -1,0 +1,29 @@
+# Dependencies
+/node_modules/
+
+# Next.js
+/.next/
+/out/
+
+# Tests
+/coverage/
+/playwright-report/
+/test-results/
+
+# Environment and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+credentials*.json
+
+# Local tooling
+.DS_Store
+Thumbs.db
+*.log
+.vercel/
+.superpowers/
+
+# TypeScript
+*.tsbuildinfo
