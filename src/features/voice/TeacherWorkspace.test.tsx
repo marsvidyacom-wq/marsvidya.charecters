@@ -13,7 +13,7 @@ describe("TeacherWorkspace", () => {
       screen.getByRole("button", { name: "Start speaking with your AI English teacher" }),
     ).toBeInTheDocument();
     expect(screen.getByRole("status")).toHaveTextContent("Ready to practice");
-    expect(screen.getByRole("link", { name: "Chat Mode" })).toHaveAttribute("href", "/chat");
+    expect(screen.queryByRole("link", { name: "Chat Mode" })).not.toBeInTheDocument();
   });
 
   it("announces_the_current_listening_phase_in_text", () => {

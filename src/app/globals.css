@@ -405,53 +405,6 @@ a {
   text-align: center;
 }
 
-.mode-divider {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin: 0.7rem 0;
-  color: #90a6ba;
-  font-size: 0.68rem;
-  font-weight: 700;
-  text-transform: uppercase;
-}
-
-.mode-divider::before,
-.mode-divider::after {
-  height: 1px;
-  flex: 1;
-  background: var(--border-soft);
-  content: "";
-}
-
-.chat-mode-link {
-  display: flex;
-  min-height: 3rem;
-  align-items: center;
-  gap: 0.65rem;
-  border-radius: 1rem;
-  padding: 0.55rem 0.75rem;
-  color: var(--color-navy);
-  font-size: 0.88rem;
-  font-weight: 750;
-}
-
-.chat-mode-link:hover {
-  background: var(--color-sky-soft);
-}
-
-.chat-mode-link svg {
-  width: 1.25rem;
-  height: 1.25rem;
-  color: var(--color-blue);
-}
-
-.chat-mode-link__arrow {
-  margin-left: auto;
-  color: var(--color-blue);
-  font-size: 1.2rem;
-}
-
 .teacher-footer {
   display: none;
 }
@@ -594,14 +547,21 @@ a {
 }
 
 .back-link {
-  display: inline-flex;
+  display: flex;
+  width: max-content;
   min-height: 2.75rem;
   align-items: center;
   gap: 0.45rem;
-  margin-bottom: 0.75rem;
+  margin: 0 auto 0.75rem;
   color: var(--color-blue);
   font-size: 0.8rem;
   font-weight: 750;
+}
+
+.chat-workspace__heading .eyebrow {
+  display: flex;
+  width: max-content;
+  margin: 0 auto;
 }
 
 .chat-panel {
