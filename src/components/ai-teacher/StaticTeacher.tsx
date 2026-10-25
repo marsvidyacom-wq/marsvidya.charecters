@@ -10,12 +10,12 @@ export function StaticTeacher({ phase, isSpeaking }: AITeacherProps) {
     >
       <div aria-hidden="true" className="teacher-portrait__halo" />
       <Image
-        alt="MarsVidya AI English Teacher"
+        alt="Krishna, ready to listen and share wisdom"
         className="teacher-portrait__image"
         fill
         priority
         sizes="(max-width: 767px) 92vw, 48vw"
-        src="/images/ai-teacher/marsvidya-teacher.webp"
+        src="/images/login/krishna-flute-at-sunset.png"
       />
       <div aria-hidden="true" className="teacher-portrait__base" />
     </div>

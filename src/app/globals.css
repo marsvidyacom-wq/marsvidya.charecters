@@ -707,6 +707,458 @@ a {
   font-size: 0.67rem;
 }
 
+.login-page {
+  position: relative;
+  display: grid;
+  min-height: 100svh;
+  place-items: center;
+  overflow: hidden;
+  isolation: isolate;
+  padding: max(2rem, env(safe-area-inset-top)) max(1.25rem, env(safe-area-inset-right)) max(2rem, env(safe-area-inset-bottom)) max(1.25rem, env(safe-area-inset-left));
+  background-color: #101a2b;
+  background-image: url("/images/login/krishna-character-grid.png");
+  background-position: center 42%;
+  background-size: cover;
+  color: #fff;
+}
+
+.login-page__shade {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(4, 9, 18, 0.28) 0%, rgba(4, 9, 18, 0.28) 28%, rgba(4, 9, 18, 0.68) 52%, rgba(4, 9, 18, 0.87) 100%);
+}
+
+.login-card {
+  width: min(100%, 42rem);
+}
+
+.login-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  color: #fff4d9;
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  text-shadow: 0 2px 18px #000;
+}
+
+.login-brand__mark {
+  display: grid;
+  width: 2.6rem;
+  height: 2.6rem;
+  place-items: center;
+  border: 1px solid rgba(255, 227, 165, 0.65);
+  border-radius: 50%;
+  background: linear-gradient(145deg, #f8b23b, #d6601f 65%, #941f29);
+  color: #fff;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+}
+
+.login-copy {
+  margin: clamp(2.5rem, 12vh, 7rem) 0 2rem;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.75);
+}
+
+.login-copy__eyebrow {
+  margin: 0 0 0.65rem;
+  color: #ffd98b;
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+}
+
+.login-copy h1 {
+  max-width: 16ch;
+  margin: 0;
+  font-size: clamp(2.25rem, 8vw, 4.2rem);
+  font-weight: 820;
+  letter-spacing: -0.055em;
+  line-height: 1.02;
+}
+
+.login-copy__subtitle {
+  margin: 1rem 0 0;
+  color: #f4f5f8;
+  font-size: clamp(1rem, 3.6vw, 1.35rem);
+  font-weight: 650;
+}
+
+.login-form {
+  padding: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 1.65rem;
+  background: rgba(9, 15, 27, 0.48);
+  box-shadow: 0 22px 55px rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(12px);
+}
+
+.login-phone-field {
+  display: flex;
+  min-height: 4.5rem;
+  align-items: center;
+  gap: 0.85rem;
+  border: 1px solid rgba(219, 231, 255, 0.62);
+  border-radius: 1.15rem;
+  background: rgba(12, 19, 32, 0.78);
+  padding: 0 1rem;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.login-phone-field:focus-within {
+  border-color: #77b5ff;
+  box-shadow: 0 0 0 3px rgba(59, 143, 255, 0.24);
+}
+
+.login-phone-field__code {
+  display: flex;
+  min-height: 2.7rem;
+  align-items: center;
+  gap: 0.45rem;
+  border-right: 1px solid rgba(219, 231, 255, 0.35);
+  padding-right: 0.9rem;
+  color: white;
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+.login-phone-field input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #fff;
+  font-size: 1rem;
+}
+
+.login-phone-field input::placeholder {
+  color: rgba(235, 241, 250, 0.72);
+}
+
+.login-continue {
+  display: flex;
+  width: 100%;
+  min-height: 4.4rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.9rem;
+  margin-top: 0.8rem;
+  border: 0;
+  border-radius: 1.1rem;
+  background: linear-gradient(135deg, #4898ff, #2778e9);
+  color: white;
+  cursor: pointer;
+  font-size: 1.25rem;
+  font-weight: 800;
+  box-shadow: 0 12px 30px rgba(18, 96, 198, 0.36);
+  transition: filter 160ms ease, transform 160ms ease;
+}
+
+.login-continue:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+.login-continue__arrow {
+  font-size: 1.8rem;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.login-message {
+  min-height: 1.2rem;
+  margin: 0.65rem 0 0;
+  color: #ffe0a2;
+  font-size: 0.82rem;
+  text-align: center;
+}
+
+.login-legal {
+  margin: 1.35rem 0 0;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.85rem;
+  line-height: 1.8;
+  text-align: center;
+  text-shadow: 0 2px 12px #000;
+}
+
+.login-legal span {
+  color: #64aaff;
+  font-weight: 650;
+}
+
+.login-form--otp {
+  text-align: center;
+}
+
+.otp-heading {
+  margin: 0.15rem 0 0.9rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.9rem;
+}
+
+.otp-heading p {
+  margin: 0.5rem 0 0;
+}
+
+.otp-heading strong {
+  color: #fff;
+  white-space: nowrap;
+}
+
+.otp-edit-number {
+  border: 0;
+  background: transparent;
+  color: #8ec2ff;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.82rem;
+}
+
+.demo-otp {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin: 0.1rem 0 0.8rem;
+  border: 1px solid rgba(255, 221, 146, 0.35);
+  border-radius: 999px;
+  background: rgba(255, 191, 75, 0.12);
+  padding: 0.45rem 0.8rem;
+  color: #ffe7b4;
+  font-size: 0.78rem;
+}
+
+.demo-otp strong {
+  color: #fff;
+  font-size: 1rem;
+  letter-spacing: 0.22em;
+}
+
+.otp-entry {
+  display: block;
+  width: min(100%, 15rem);
+  min-height: 4.2rem;
+  margin: 0 auto 0.2rem;
+  border: 1px solid rgba(219, 231, 255, 0.62);
+  border-radius: 1rem;
+  outline: 0;
+  background: rgba(12, 19, 32, 0.78);
+  color: #fff;
+  font-size: 1.8rem;
+  font-weight: 750;
+  letter-spacing: 0.55em;
+  text-align: center;
+  text-indent: 0.55em;
+}
+
+.otp-entry:focus {
+  border-color: #77b5ff;
+  box-shadow: 0 0 0 3px rgba(59, 143, 255, 0.24);
+}
+
+.home-screen {
+  position: relative;
+  display: flex;
+  min-height: 100svh;
+  flex-direction: column;
+  overflow: hidden;
+  isolation: isolate;
+  background-color: #15254a;
+  background-image: url("/images/login/krishna-flute-at-sunset.png");
+  background-position: 43% center;
+  background-size: cover;
+  color: #fff;
+}
+
+.home-screen__shade {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(7, 15, 38, 0.24) 0%, transparent 24%, rgba(9, 19, 43, 0.08) 54%, rgba(7, 12, 29, 0.64) 100%), linear-gradient(90deg, rgba(7, 13, 29, 0.25), transparent 74%);
+}
+
+.home-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: max(1.25rem, env(safe-area-inset-top)) max(1.25rem, env(safe-area-inset-right)) 0 max(1.25rem, env(safe-area-inset-left));
+}
+
+.home-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: #fff6e6;
+  font-size: 1.15rem;
+  font-weight: 850;
+  letter-spacing: -0.04em;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.7);
+}
+
+.home-brand__mark {
+  display: grid;
+  width: 2.5rem;
+  height: 2.5rem;
+  place-items: center;
+  border: 1px solid rgba(255, 231, 177, 0.78);
+  border-radius: 50%;
+  background: linear-gradient(145deg, #f7b540, #d45b23 68%, #942434);
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.28);
+}
+
+.home-profile {
+  display: grid;
+  width: 3rem;
+  height: 3rem;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.58);
+  border-radius: 50%;
+  background: rgba(17, 26, 48, 0.28);
+  color: #fff;
+  backdrop-filter: blur(8px);
+}
+
+.home-profile svg {
+  width: 1.65rem;
+  height: 1.65rem;
+}
+
+.home-copy {
+  width: min(100%, 52rem);
+  margin: clamp(5rem, 17vh, 11rem) auto 0;
+  padding: 0 1.4rem;
+  text-shadow: 0 3px 24px rgba(0, 0, 0, 0.78);
+}
+
+.home-copy__eyebrow {
+  margin: 0 0 0.7rem;
+  color: #ffda8f;
+  font-size: 0.7rem;
+  font-weight: 850;
+  letter-spacing: 0.15em;
+}
+
+.home-copy h1 {
+  max-width: 14ch;
+  margin: 0;
+  font-size: clamp(2rem, 7vw, 3.5rem);
+  font-weight: 850;
+  letter-spacing: -0.055em;
+  line-height: 1.02;
+}
+
+.home-copy > p:last-child {
+  margin: 0.9rem 0 0;
+  font-size: clamp(0.95rem, 3vw, 1.25rem);
+  font-weight: 650;
+}
+
+.home-characters {
+  position: absolute;
+  top: 22%;
+  right: max(0.75rem, env(safe-area-inset-right));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(0.45rem, 2vh, 1rem);
+}
+
+.home-character {
+  display: grid;
+  justify-items: center;
+  gap: 0.25rem;
+  color: white;
+  font-size: 0.62rem;
+  font-weight: 750;
+  text-shadow: 0 1px 6px #000;
+}
+
+.home-character__portrait {
+  width: clamp(2.7rem, 10vw, 4rem);
+  aspect-ratio: 1;
+  border: 2px solid rgba(255, 220, 139, 0.8);
+  border-radius: 50%;
+  background-color: #273553;
+  background-image: url("/images/login/krishna-character-grid.png");
+  background-size: 390% auto;
+  box-shadow: 0 3px 14px rgba(0, 0, 0, 0.48);
+}
+
+.home-character--1 .home-character__portrait { background-position: 82% 4%; }
+.home-character--2 .home-character__portrait { background-position: 4% 3%; }
+.home-character--3 .home-character__portrait { background-position: 48% 4%; }
+.home-character--4 .home-character__portrait { background-position: 50% 34%; }
+
+.home-character--add {
+  width: clamp(2.7rem, 10vw, 4rem);
+  aspect-ratio: 1;
+  place-items: center;
+  border: 2px solid rgba(255, 220, 139, 0.75);
+  border-radius: 50%;
+  background: rgba(26, 28, 46, 0.58);
+  font-size: 1.8rem;
+  font-weight: 400;
+}
+
+.home-action {
+  display: grid;
+  justify-items: center;
+  gap: 0.4rem;
+  margin: auto auto max(1.75rem, env(safe-area-inset-bottom));
+  padding-top: 2rem;
+}
+
+.home-mic {
+  display: grid;
+  width: 4.65rem;
+  height: 4.65rem;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: 50%;
+  background: linear-gradient(145deg, #257aff, #0758d7);
+  color: white;
+  box-shadow: 0 10px 32px rgba(0, 48, 142, 0.48), 0 0 0 7px rgba(45, 132, 255, 0.18);
+  transition: transform 160ms ease;
+}
+
+.home-mic:hover { transform: translateY(-2px) scale(1.03); }
+.home-mic svg { width: 2rem; height: 2rem; }
+
+.home-action__label {
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-shadow: 0 2px 10px #000;
+}
+
+@media (min-width: 768px) {
+  .login-page {
+    background-position: center 38%;
+  }
+
+  .login-copy {
+    margin-top: clamp(3rem, 10vh, 6rem);
+  }
+
+  .login-form {
+    padding: 1.25rem;
+  }
+
+  .home-screen {
+    background-position: center 35%;
+  }
+
+  .home-copy {
+    margin-left: max(4rem, calc((100vw - 68rem) / 2));
+  }
+
+  .home-characters {
+    right: max(2rem, calc((100vw - 76rem) / 2));
+  }
+}
+
 @media (min-width: 768px) {
   .chat-workspace {
     padding-top: 2rem;

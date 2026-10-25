@@ -24,7 +24,7 @@ export function MarsVidyaHeader() {
           <span>MarsVidya</span>
         </Link>
       </h1>
-      <Link className="profile-link" href="/profile">
+      <Link className="profile-link" href="/login">
         <ProfileIcon />
         <span>Sign in</span>
       </Link>

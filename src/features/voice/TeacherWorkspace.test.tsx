@@ -8,11 +8,11 @@ describe("TeacherWorkspace", () => {
     render(<TeacherWorkspace />);
 
     expect(screen.getByRole("heading", { name: "MarsVidya" })).toBeInTheDocument();
-    expect(screen.getByRole("img", { name: "MarsVidya AI English Teacher" })).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: "Krishna, ready to listen and share wisdom" })).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: "Start speaking with your AI English teacher" }),
+      screen.getByRole("button", { name: "Start speaking with Lord Krishna. Your browser will ask for microphone access." }),
     ).toBeInTheDocument();
-    expect(screen.getByRole("status")).toHaveTextContent("Ready to practice");
+    expect(screen.getByRole("status")).toHaveTextContent("Ready when you are");
     expect(screen.queryByRole("link", { name: "Chat Mode" })).not.toBeInTheDocument();
   });
 
@@ -26,7 +26,7 @@ describe("TeacherWorkspace", () => {
 
     render(<TeacherWorkspace initialState={listening} />);
 
-    expect(screen.getByRole("status")).toHaveTextContent("I'm listening");
+    expect(screen.getByRole("status")).toHaveTextContent("Krishna is listening");
     expect(screen.getByRole("button", { name: "Stop listening" })).toBeInTheDocument();
   });
 

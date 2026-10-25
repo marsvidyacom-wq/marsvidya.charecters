@@ -28,7 +28,7 @@ export function VoiceButton({ phase, onClick }: VoiceButtonProps) {
     ? "Stop listening"
     : isError
       ? "Try speaking again"
-      : "Start speaking with your AI English teacher. Your browser will ask for microphone access.";
+      : "Start speaking with Lord Krishna. Your browser will ask for microphone access.";
 
   return (
     <Button

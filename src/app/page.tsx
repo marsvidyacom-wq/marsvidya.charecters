@@ -1,5 +1,5 @@
-import { TeacherWorkspace } from "@/features/voice/TeacherWorkspace";
+import { LoginPage } from "@/features/auth/LoginPage";
 
 export default function HomePage() {
-  return <TeacherWorkspace />;
+  return <LoginPage />;
 }

@@ -7,7 +7,7 @@ export const metadata: Metadata = {
     default: "MarsVidya — Learn for the Future",
     template: "%s | MarsVidya",
   },
-  description: "A friendly AI English teacher for voice and chat practice.",
+  description: "Talk with inspiring characters. Explore, learn, and grow through voice conversations.",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {

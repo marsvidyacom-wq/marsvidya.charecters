@@ -2,11 +2,11 @@ import { StatusMessage } from "@/components/ui/StatusMessage";
 import type { VoiceState } from "@/types/voice";
 
 const phaseLabels = {
-  idle: "Ready to practice",
-  listening: "I'm listening…",
-  transcribing: "Turning your speech into words…",
-  thinking: "Your teacher is thinking…",
-  speaking: "Your teacher is speaking…",
+  idle: "Ready when you are",
+  listening: "Krishna is listening…",
+  transcribing: "Listening closely to your words…",
+  thinking: "Krishna is reflecting…",
+  speaking: "Krishna is speaking…",
 } as const;
 
 export function VoiceStatus({ state }: { state: VoiceState }) {

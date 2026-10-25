@@ -19,7 +19,8 @@ export function TeacherWorkspace({ initialState }: TeacherWorkspaceProps) {
   const recorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const historyRef = useRef<Array<{ role: "user" | "assistant"; content: string }>>([]);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const sessionIdRef = useRef<string | null>(null);
 
   async function finishRecording(recorder: MediaRecorder) {
     dispatch({ type: "STOP_LISTENING" });
@@ -32,22 +33,32 @@ export function TeacherWorkspace({ initialState }: TeacherWorkspaceProps) {
       const stt = await sttResponse.json();
       if (!sttResponse.ok) throw new Error(stt.error || "I couldn't understand that. Please try again.");
       dispatch({ type: "TRANSCRIPTION_SUCCEEDED", transcript: stt.transcript });
-      const messages = [...historyRef.current.slice(-28), { role: "user" as const, content: stt.transcript }];
-      const chatResponse = await fetch("/api/ai/chat", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ messages }) });
+      sessionIdRef.current ??= getOrCreateSessionId();
+      const chatResponse = await fetch("/api/ai/chat", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sessionId: sessionIdRef.current, message: stt.transcript }) });
       const chat = await chatResponse.json();
       if (!chatResponse.ok) throw new Error(chat.error || "Your teacher couldn't reply. Please try again.");
-      historyRef.current = [...messages, { role: "assistant", content: chat.reply }];
       const ttsResponse = await fetch("/api/ai/text-to-speech", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text: chat.reply }) });
       const tts = await ttsResponse.json();
       if (!ttsResponse.ok) throw new Error(tts.error || "Your teacher replied, but voice playback failed.");
       dispatch({ type: "SPEECH_READY", response: chat.reply });
       const binary = atob(tts.audio);
       const bytes = Uint8Array.from(binary, (character) => character.charCodeAt(0));
-      const player = new Audio(URL.createObjectURL(new Blob([bytes], { type: "audio/wav" })));
-      audioRef.current = player;
-      player.onended = () => dispatch({ type: "PLAYBACK_ENDED" });
-      player.onerror = () => dispatch({ type: "FAILED", error: { code: "playback-failed", message: "Audio playback failed. Tap the microphone to try again.", retryable: true } });
-      await player.play();
+      const audioContext = audioContextRef.current;
+      if (audioContext) {
+        await audioContext.resume();
+        const audioBuffer = await audioContext.decodeAudioData(bytes.buffer.slice(0));
+        const source = audioContext.createBufferSource();
+        source.buffer = audioBuffer;
+        source.connect(audioContext.destination);
+        source.onended = () => dispatch({ type: "PLAYBACK_ENDED" });
+        source.start();
+      } else {
+        const player = new Audio(URL.createObjectURL(new Blob([bytes], { type: "audio/wav" })));
+        audioRef.current = player;
+        player.onended = () => dispatch({ type: "PLAYBACK_ENDED" });
+        player.onerror = () => dispatch({ type: "FAILED", error: { code: "playback-failed", message: "Audio playback failed. Tap the microphone to try again.", retryable: true } });
+        await player.play();
+      }
     } catch (error) {
       dispatch({ type: "FAILED", error: { code: "provider-failed", message: error instanceof Error ? error.message : "Voice conversation failed. Please try again.", retryable: true } });
     }
@@ -60,6 +71,10 @@ export function TeacherWorkspace({ initialState }: TeacherWorkspaceProps) {
           throw new Error("Microphone access needs a secure connection. Open this site with HTTPS on your phone.");
         }
         if (!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) throw new Error("This browser does not support microphone recording.");
+        if (window.AudioContext && !audioContextRef.current) {
+          audioContextRef.current = new AudioContext();
+          void audioContextRef.current.resume();
+        }
         // getUserMedia triggers the browser's native permission prompt from this tap.
         const stream = await navigator.mediaDevices.getUserMedia({
           audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
@@ -90,9 +105,9 @@ export function TeacherWorkspace({ initialState }: TeacherWorkspaceProps) {
       <main className="teacher-workspace">
         <section aria-labelledby="teacher-greeting" className="teacher-stage">
           <div className="teacher-stage__copy">
-            <span className="eyebrow">Your personal speaking space</span>
-            <h2 id="teacher-greeting">Hi! I&apos;m your AI English Teacher.</h2>
-            <p>Speak naturally. We&apos;ll practise together, one friendly conversation at a time.</p>
+            <span className="eyebrow">A moment for wisdom</span>
+            <h2 id="teacher-greeting">Speak with Lord Krishna.</h2>
+            <p>Share what is on your mind and hear calm guidance inspired by the Bhagavad Gita.</p>
           </div>
           <AITeacher isSpeaking={state.phase === "speaking"} phase={state.phase} />
         </section>
@@ -105,7 +120,7 @@ export function TeacherWorkspace({ initialState }: TeacherWorkspaceProps) {
           <AudioWaveform phase={state.phase} />
           <VoiceButton onClick={handleVoiceAction} phase={state.phase} />
           {state.transcript && <p className="practice-panel__hint"><strong>You:</strong> {state.transcript}</p>}
-          {state.response && <p className="practice-panel__hint"><strong>Teacher:</strong> {state.response}</p>}
+          {state.response && <p className="practice-panel__hint"><strong>Krishna:</strong> {state.response}</p>}
           {!state.transcript && <p className="practice-panel__hint">Tap the microphone and start talking. Tap again when you finish.</p>}
         </Card>
       </main>
@@ -115,4 +130,13 @@ export function TeacherWorkspace({ initialState }: TeacherWorkspaceProps) {
       </footer>
     </div>
   );
+}
+
+function getOrCreateSessionId(): string {
+  const key = "marsvidya-voice-session";
+  const stored = window.localStorage.getItem(key);
+  if (stored) return stored;
+  const sessionId = window.crypto.randomUUID();
+  window.localStorage.setItem(key, sessionId);
+  return sessionId;
 }

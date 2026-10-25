@@ -8,6 +8,7 @@ const optionalString = z.preprocess(
 const serverEnvSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   DATABASE_URL: optionalString,
+  DATABASE_SSL_CA_BASE64: optionalString,
   AUTH_SECRET: optionalString,
   AUTH_GOOGLE_ID: optionalString,
   AUTH_GOOGLE_SECRET: optionalString,
