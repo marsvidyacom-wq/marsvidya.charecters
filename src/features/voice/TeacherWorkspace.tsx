@@ -19,7 +19,9 @@ export function TeacherWorkspace({ initialState }: TeacherWorkspaceProps) {
   const recorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioUrlRef = useRef<string | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
+  const audioContextResumeRef = useRef<Promise<void> | null>(null);
   const sessionIdRef = useRef<string | null>(null);
 
   async function finishRecording(recorder: MediaRecorder) {
@@ -30,38 +32,61 @@ export function TeacherWorkspace({ initialState }: TeacherWorkspaceProps) {
       const extension = audio.type.includes("mp4") ? "mp4" : audio.type.includes("ogg") ? "ogg" : "webm";
       form.append("file", audio, `practice.${extension}`);
       const sttResponse = await fetch("/api/ai/speech-to-text", { method: "POST", body: form });
-      const stt = await sttResponse.json();
+      const stt = await readJsonResponse<{ transcript?: string; error?: string }>(sttResponse, "Speech recognition returned an invalid response.");
       if (!sttResponse.ok) throw new Error(stt.error || "I couldn't understand that. Please try again.");
-      dispatch({ type: "TRANSCRIPTION_SUCCEEDED", transcript: stt.transcript });
+      const transcript = stt.transcript?.trim();
+      if (!transcript) throw new Error("I couldn't hear clear words. Please try speaking again.");
+      dispatch({ type: "TRANSCRIPTION_SUCCEEDED", transcript });
       sessionIdRef.current ??= getOrCreateSessionId();
-      const chatResponse = await fetch("/api/ai/chat", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sessionId: sessionIdRef.current, message: stt.transcript }) });
-      const chat = await chatResponse.json();
+      const chatResponse = await fetch("/api/ai/chat", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sessionId: sessionIdRef.current, message: transcript }) });
+      const chat = await readJsonResponse<{ reply?: string; error?: string }>(chatResponse, "Your teacher returned an invalid response.");
       if (!chatResponse.ok) throw new Error(chat.error || "Your teacher couldn't reply. Please try again.");
       const ttsResponse = await fetch("/api/ai/text-to-speech", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text: chat.reply }) });
-      const tts = await ttsResponse.json();
+      const tts = await readJsonResponse<{ audio?: string; error?: string }>(ttsResponse, "Voice generation returned an invalid response.");
       if (!ttsResponse.ok) throw new Error(tts.error || "Your teacher replied, but voice playback failed.");
-      dispatch({ type: "SPEECH_READY", response: chat.reply });
+      if (!chat.reply || !tts.audio) throw new Error("The voice response was incomplete. Please try again.");
       const binary = atob(tts.audio);
       const bytes = Uint8Array.from(binary, (character) => character.charCodeAt(0));
       const audioContext = audioContextRef.current;
       if (audioContext) {
-        await audioContext.resume();
-        const audioBuffer = await audioContext.decodeAudioData(bytes.buffer.slice(0));
-        const source = audioContext.createBufferSource();
-        source.buffer = audioBuffer;
-        source.connect(audioContext.destination);
-        source.onended = () => dispatch({ type: "PLAYBACK_ENDED" });
-        source.start();
-      } else {
-        const player = new Audio(URL.createObjectURL(new Blob([bytes], { type: "audio/wav" })));
-        audioRef.current = player;
-        player.onended = () => dispatch({ type: "PLAYBACK_ENDED" });
-        player.onerror = () => dispatch({ type: "FAILED", error: { code: "playback-failed", message: "Audio playback failed. Tap the microphone to try again.", retryable: true } });
-        await player.play();
+        try {
+          await (audioContextResumeRef.current ?? audioContext.resume());
+          const audioBuffer = await audioContext.decodeAudioData(bytes.buffer.slice(0));
+          dispatch({ type: "SPEECH_READY", response: chat.reply });
+          const source = audioContext.createBufferSource();
+          source.buffer = audioBuffer;
+          source.connect(audioContext.destination);
+          source.onended = () => dispatch({ type: "PLAYBACK_ENDED" });
+          source.start();
+          return;
+        } catch {
+          // Some mobile browsers cannot decode a provider WAV buffer. Fall back to native audio playback.
+        }
       }
+      dispatch({ type: "SPEECH_READY", response: chat.reply });
+      const player = new Audio(URL.createObjectURL(new Blob([bytes], { type: "audio/wav" })));
+      audioUrlRef.current = player.src;
+      audioRef.current = player;
+      player.onended = () => {
+        releaseAudioElement();
+        dispatch({ type: "PLAYBACK_ENDED" });
+      };
+      player.onerror = () => {
+        releaseAudioElement();
+        dispatch({ type: "FAILED", error: { code: "playback-failed", message: "Audio playback failed. Tap the microphone to try again.", retryable: true } });
+      };
+      await player.play();
     } catch (error) {
+      releaseAudioElement();
       dispatch({ type: "FAILED", error: { code: "provider-failed", message: error instanceof Error ? error.message : "Voice conversation failed. Please try again.", retryable: true } });
     }
+  }
+
+  function releaseAudioElement() {
+    audioRef.current?.pause();
+    audioRef.current = null;
+    if (audioUrlRef.current) URL.revokeObjectURL(audioUrlRef.current);
+    audioUrlRef.current = null;
   }
 
   async function handleVoiceAction() {
@@ -73,7 +98,7 @@ export function TeacherWorkspace({ initialState }: TeacherWorkspaceProps) {
         if (!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) throw new Error("This browser does not support microphone recording.");
         if (window.AudioContext && !audioContextRef.current) {
           audioContextRef.current = new AudioContext();
-          void audioContextRef.current.resume();
+          audioContextResumeRef.current = audioContextRef.current.resume().catch(() => undefined);
         }
         // getUserMedia triggers the browser's native permission prompt from this tap.
         const stream = await navigator.mediaDevices.getUserMedia({
@@ -93,6 +118,11 @@ export function TeacherWorkspace({ initialState }: TeacherWorkspaceProps) {
         dispatch({ type: "FAILED", error: { code: denied ? "permission-denied" : "unknown", message: denied ? "Microphone permission is blocked. Allow microphone access for this site in your phone's browser settings, then tap Try again." : error instanceof Error ? error.message : "Please allow microphone access to speak with your teacher.", retryable: true } });
       }
     } else if (state.phase === "listening") {
+      if (audioContextRef.current) {
+        // Mobile browsers can suspend a silent context during the recording and API round trips.
+        // Resume it directly from the stop tap so the later response can play without another gesture.
+        audioContextResumeRef.current = audioContextRef.current.resume().catch(() => undefined);
+      }
       recorderRef.current?.stop();
     } else if (state.phase === "error") {
       dispatch({ type: "RETRY" });
@@ -130,6 +160,14 @@ export function TeacherWorkspace({ initialState }: TeacherWorkspaceProps) {
       </footer>
     </div>
   );
+}
+
+async function readJsonResponse<T extends { error?: string }>(response: Response, fallback: string): Promise<T> {
+  try {
+    return await response.json() as T;
+  } catch {
+    throw new Error(fallback);
+  }
 }
 
 function getOrCreateSessionId(): string {

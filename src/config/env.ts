@@ -30,6 +30,7 @@ const serverEnvSchema = z.object({
   RAZORPAY_KEY_SECRET: optionalString,
   RAZORPAY_WEBHOOK_SECRET: optionalString,
   REDIS_URL: optionalString,
+  SARVAM_API: optionalString,
 });
 
 export type ServerEnv = z.infer<typeof serverEnvSchema>;
@@ -44,6 +45,7 @@ const productionRequired = [
   "AUTH_GOOGLE_ID",
   "AUTH_GOOGLE_SECRET",
   "AI_API_KEY",
+  "SARVAM_API",
 ] as const satisfies ReadonlyArray<keyof ServerEnv>;
 
 export function getServerEnv(): ServerEnv {

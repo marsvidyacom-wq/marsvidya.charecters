@@ -8,6 +8,7 @@ const productionEnv = {
   AUTH_GOOGLE_ID: "google-client-id",
   AUTH_GOOGLE_SECRET: "google-client-secret",
   AI_API_KEY: "test-openai-key",
+  SARVAM_API: "test-sarvam-key",
 };
 
 describe("environment configuration", () => {
@@ -22,6 +23,7 @@ describe("environment configuration", () => {
     vi.stubEnv("AUTH_GOOGLE_ID", "");
     vi.stubEnv("AUTH_GOOGLE_SECRET", "");
     vi.stubEnv("AI_API_KEY", "");
+    vi.stubEnv("SARVAM_API", "");
 
     const result = getServerEnv();
 
@@ -37,8 +39,18 @@ describe("environment configuration", () => {
     vi.stubEnv("AUTH_GOOGLE_ID", "");
     vi.stubEnv("AUTH_GOOGLE_SECRET", "");
     vi.stubEnv("AI_API_KEY", "");
+    vi.stubEnv("SARVAM_API", "");
 
     expect(() => getServerEnv()).toThrow(/production configuration/i);
+  });
+
+  it("requires the Sarvam key for production voice routes", () => {
+    for (const [key, value] of Object.entries(productionEnv)) {
+      vi.stubEnv(key, value);
+    }
+    vi.stubEnv("SARVAM_API", "");
+
+    expect(() => getServerEnv()).toThrow(/SARVAM_API/);
   });
 
   it("accepts_complete_production_configuration", () => {
