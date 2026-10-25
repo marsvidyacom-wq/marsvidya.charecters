@@ -54,10 +54,11 @@ export function transitionVoiceState(_state: VoiceState, _event: VoiceEvent): Vo
         error: null,
       };
     case "thinking":
-      return event.type === "SPEECH_READY"
-        ? { ...state, phase: "speaking", response: event.response, error: null }
-        : state;
+      if (event.type === "RESPONSE_TEXT") return { ...state, response: state.response + event.text };
+      if (event.type === "SPEECH_STARTED") return { ...state, phase: "speaking", error: null };
+      return event.type === "SPEECH_READY" ? { ...state, phase: "speaking", response: event.response, error: null } : state;
     case "speaking":
+      if (event.type === "RESPONSE_TEXT") return { ...state, response: state.response + event.text };
       return event.type === "PLAYBACK_ENDED" ? { ...state, phase: "idle" } : state;
     case "error":
       return state;

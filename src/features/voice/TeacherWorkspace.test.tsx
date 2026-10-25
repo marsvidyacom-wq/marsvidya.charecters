@@ -53,8 +53,12 @@ describe("TeacherWorkspace", () => {
         return Response.json({ transcript: "मुझे साहस दीजिए" });
       }
       requests.push(new Request(`http://localhost${url}`, init));
-      if (url === "/api/ai/chat") return Response.json({ reply: "वत्स, अपने धर्म पर अडिग रहो।" });
-      return Response.json({ audio: "UklGRg==" });
+      const events = [
+        { type: "text", text: "वत्स, अपने धर्म पर अडिग रहो।" },
+        { type: "audio", audio: "UklGRg==" },
+        { type: "done" },
+      ].map((event) => `data: ${JSON.stringify(event)}\n\n`).join("");
+      return new Response(events, { headers: { "Content-Type": "text/event-stream" } });
     });
     vi.stubGlobal("fetch", fetchMock);
 
@@ -74,44 +78,36 @@ describe("TeacherWorkspace", () => {
     }
     vi.stubGlobal("MediaRecorder", TestRecorder);
 
-    const play = vi.fn().mockResolvedValue(undefined);
     const resume = vi.fn().mockResolvedValue(undefined);
-    const decodeAudioData = vi.fn().mockRejectedValue(new Error("unsupported WAV decoder"));
+    const decodeAudioData = vi.fn().mockResolvedValue({});
+    const start = vi.fn(() => queueMicrotask(() => source.onended?.()));
+    const source = { buffer: null as AudioBuffer | null, connect: vi.fn(), onended: null as (() => void) | null, start };
     vi.stubGlobal("AudioContext", class TestAudioContext {
       destination = {};
       resume = resume;
       decodeAudioData = decodeAudioData;
+      createBufferSource = vi.fn(() => source);
     });
-    class TestAudio {
-      src = "";
-      onended: (() => void) | null = null;
-      onerror: (() => void) | null = null;
-      play = play;
-      pause() {}
-      constructor(src: string) { this.src = src; }
-    }
-    vi.stubGlobal("Audio", TestAudio);
-    Object.defineProperty(URL, "createObjectURL", { configurable: true, value: vi.fn(() => "blob:voice-response") });
-    Object.defineProperty(URL, "revokeObjectURL", { configurable: true, value: vi.fn() });
 
-    render(<TeacherWorkspace />);
-    fireEvent.click(screen.getByRole("button", { name: /start speaking/i }));
+    render(<TeacherWorkspace variant="home" />);
+    expect(screen.getByRole("heading", { name: "Talk with your favourite characters" })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Start speaking with Krishna" }));
     await waitFor(() => expect(screen.getByRole("status")).toHaveTextContent("Krishna is listening"));
     fireEvent.click(screen.getByRole("button", { name: "Stop listening" }));
 
     await waitFor(() => expect(screen.getByText("वत्स, अपने धर्म पर अडिग रहो।")).toBeInTheDocument());
-    expect(fetchMock).toHaveBeenCalledTimes(3);
+    await waitFor(() => expect(screen.getByRole("status")).toHaveTextContent("Tap the microphone and speak with Krishna"));
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(window.location.pathname).toBe("/");
     expect(requests.map((request) => new URL(request.url).pathname)).toEqual([
       "/api/ai/speech-to-text",
-      "/api/ai/chat",
-      "/api/ai/text-to-speech",
+      "/api/ai/voice-response",
     ]);
     expect(await requests[0].formData()).toHaveProperty("get");
     expect(JSON.parse(await requests[1].text())).toMatchObject({ message: "मुझे साहस दीजिए" });
-    expect(JSON.parse(await requests[2].text())).toEqual({ text: "वत्स, अपने धर्म पर अडिग रहो।" });
-    expect(resume).toHaveBeenCalledTimes(2);
+    expect(resume).toHaveBeenCalledTimes(3);
     expect(decodeAudioData).toHaveBeenCalledOnce();
-    expect(play).toHaveBeenCalledOnce();
+    expect(start).toHaveBeenCalledOnce();
     expect(tracks[0].stop).toHaveBeenCalledOnce();
   });
 });

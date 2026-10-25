@@ -26,6 +26,8 @@ export type VoiceEvent =
   | { type: "START_LISTENING" }
   | { type: "STOP_LISTENING" }
   | { type: "TRANSCRIPTION_SUCCEEDED"; transcript: string }
+  | { type: "RESPONSE_TEXT"; text: string }
+  | { type: "SPEECH_STARTED" }
   | { type: "SPEECH_READY"; response: string }
   | { type: "PLAYBACK_ENDED" }
   | { type: "FAILED"; error: VoiceError }

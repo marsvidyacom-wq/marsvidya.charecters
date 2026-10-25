@@ -1103,6 +1103,8 @@ a {
 }
 
 .home-action {
+  position: relative;
+  z-index: 2;
   display: grid;
   justify-items: center;
   gap: 0.4rem;
@@ -1126,11 +1128,66 @@ a {
 .home-mic:hover { transform: translateY(-2px) scale(1.03); }
 .home-mic svg { width: 2rem; height: 2rem; }
 
+.home-mic--listening {
+  background: linear-gradient(145deg, #22a981, #08775e);
+  box-shadow: 0 10px 32px rgba(0, 90, 65, 0.5), 0 0 0 8px rgba(43, 210, 157, 0.2);
+  animation: listening-pulse 1.3s ease-in-out infinite;
+}
+
+.home-mic:disabled {
+  cursor: wait;
+  opacity: 0.84;
+}
+
+.home-voice-status {
+  max-width: min(88vw, 30rem);
+  margin: 0 0 0.6rem;
+  border-radius: 999px;
+  padding: 0.45rem 0.85rem;
+  background: rgba(10, 18, 37, 0.64);
+  color: white;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-align: center;
+  text-shadow: 0 1px 5px #000;
+  backdrop-filter: blur(10px);
+}
+
+.home-voice-status--error { color: #ffd2c9; }
+
+.home-conversation {
+  position: absolute;
+  z-index: 2;
+  right: 1rem;
+  bottom: calc(8.5rem + env(safe-area-inset-bottom));
+  left: 1rem;
+  width: min(100% - 2rem, 42rem);
+  max-height: min(30vh, 14rem);
+  overflow: auto;
+  margin: 0 auto;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 1rem;
+  padding: 0.75rem 1rem;
+  background: rgba(9, 17, 34, 0.72);
+  color: white;
+  font-size: 0.84rem;
+  line-height: 1.5;
+  text-shadow: 0 1px 4px #000;
+  backdrop-filter: blur(14px);
+}
+
+.home-conversation p { margin: 0.2rem 0; white-space: pre-wrap; }
+.home-conversation strong { color: #ffda8f; }
+
 .home-action__label {
   color: #fff;
   font-size: 0.8rem;
   font-weight: 700;
   text-shadow: 0 2px 10px #000;
+}
+
+@keyframes listening-pulse {
+  50% { box-shadow: 0 10px 32px rgba(0, 90, 65, 0.5), 0 0 0 14px rgba(43, 210, 157, 0.08); }
 }
 
 @media (min-width: 768px) {
